@@ -1,0 +1,542 @@
+swagger: "2.0"
+
+info:
+  version: "0.0.1"
+  title: Search Local Land Charge API
+
+paths:
+  /free-searches:
+    post:
+      description: |
+        Add information about a free search into database
+      parameters:
+        - in: body
+          name: Search details
+          required: true
+          schema:
+            $ref: "#/definitions/FreeSearch"
+
+      responses:
+        201:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/FreeSearch"
+        400:
+          description: Bad request
+
+        500:
+          description: Application error
+
+  /free-searches/{free_search_id}:
+    get:
+      description: Get free search
+      parameters:
+        - in: path
+          name: free_search_id
+          required: true
+          type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/FreeSearch"
+        404:
+          description: id not found
+
+  /free-searches/query:
+    post:
+      description: |
+        Start a query of free searches
+      parameters:
+        - in: body
+          name: query
+          required: true
+          schema:
+            type: object
+            required:
+              - start_timestamp
+              - end_timestamp
+            properties:
+              extent:
+                $ref: "#/definitions/FeatureCollection"
+              start_timestamp:
+                type: string
+                format: datetime
+              end_timestamp:
+                type: string
+                format: datetime
+              exclude_ids:
+                type: array
+                items:
+                  type: string
+              user_id:
+                type: string
+              uuid:
+                type: string
+
+      produces:
+        - application/json
+
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/SearchQuery"
+
+  /free-searches/query/{search_query_id}:
+    get:
+      description: Get search query status
+      parameters:
+        - in: path
+          name: search_query_id
+          required: true
+          type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/SearchQuery"
+        404:
+          description: id not found
+
+  /free-searches/user_id/{user_id}:
+    get:
+      description: Get free searches for a user
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          type: string
+        - in: query
+          name: page
+          required: true
+          type: string
+        - in: query
+          name: per_page
+          required: true
+          type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: "#/definitions/FreeSearch"
+              total:
+                type: integer
+              pages:
+                type: integer
+  
+  /free-searches/user_id/{user_id}/{search_id}:
+    get:
+      description: Get free search for a user using search id
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          type: string
+        - in: path
+          name: search_id
+          required: true
+          type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/FreeSearch"
+        404:
+          description: Id not found
+
+  /users/{user_id}:
+    get:
+      description: Retrieve search service user details
+      operationId: getUser
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          type: string
+      responses:
+        200:
+          description: OK,
+          schema:
+            $ref: "#/definitions/UserDetails"
+        404:
+          description: "Not found"
+
+  /payments/{reference}:
+    get:
+      description: Retrieve paid search for a given reference
+      operationId: getPaidSearchByReference
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: reference
+          required: true
+          type: string
+      responses:
+        200:
+          description: OK,
+          schema:
+            $ref: "#/definitions/PaidSearch"
+        404:
+          description: "Not found"
+
+  /service-messages:
+    get:
+      description: Retrieve service messages
+      operationId: getServiceMessage
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK,
+          schema:
+            $ref: "#/definitions/ServiceMessages"
+        404:
+          description: "No messages found"
+
+    post:
+      description: Add a new service message
+      operationId: postServiceMessage
+      parameters:
+        - in: body
+          name: query
+          required: true
+          schema:
+            $ref: "#/definitions/ServiceMessage"
+      produces:
+        - application/json
+      responses:
+        201:
+          description: Successfully added
+          schema:
+            $ref: "#/definitions/ServiceMessage"
+        400:
+          description: "Failed to save message"
+
+  /service-messages/{service_message_id}:
+    delete:
+      description: Delete a specified service message
+      operationId: deleteServiceMessage
+      parameters:
+        - in: path
+          name: service_message_id
+          required: true
+          type: string
+      responses:
+        204:
+          description: Message deleted
+        404:
+          description: "Not found"
+
+  /search-status-searches:
+    post:
+      description: |
+        Add information about a search status search into database
+      parameters:
+        - in: body
+          name: Search details
+          required: true
+          schema:
+            type: object
+            properties:
+              organisation:
+                type: string
+              display_name:
+                type: string
+              search_date:
+                type: string
+                format: datetime
+              search_extent:
+                $ref: "#/definitions/FeatureCollection"
+              charge_ids:
+                type: array
+                items:
+                  type: number
+
+      responses:
+        201:
+          description: Successful response
+          schema:
+            properties:
+              user_id:
+                type: string
+              search_extent:
+                $ref: "#/definitions/FeatureCollection"
+              charge_ids:
+                type: array
+                items:
+                  type: number
+
+        400:
+          description: Bad request
+
+        500:
+          description: Application error
+
+  /search-status-searches/query:
+    post:
+      description: |
+        Start a query of search status searches
+      parameters:
+        - in: body
+          name: query
+          required: true
+          schema:
+            type: object
+            required:
+              - start_timestamp
+              - end_timestamp
+            properties:
+              extent:
+                $ref: "#/definitions/FeatureCollection"
+              start_timestamp:
+                type: string
+                format: datetime
+              end_timestamp:
+                type: string
+                format: datetime
+              exclude_ids:
+                type: array
+                items:
+                  type: string
+              user_id:
+                type: string
+              uuid:
+                type: string
+
+      produces:
+        - application/json
+
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/SearchQuery"
+
+  /search-status-searches/query/{search_query_id}:
+    get:
+      description: Get search query status
+      parameters:
+        - in: path
+          name: search_query_id
+          required: true
+          type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: "#/definitions/SearchQuery"
+        404:
+          description: id not found
+
+definitions:
+  FeatureCollection:
+    description: GeoJSON FeatureCollection
+    type: object
+    properties:
+      type:
+        type: string
+        enum:
+          - "FeatureCollection"
+      features:
+        type: array
+        items:
+          $ref: "#/definitions/Feature"
+
+  Feature:
+    description: GeoJSON Feature
+    type: object
+    properties:
+      geometry:
+        $ref: "#/definitions/Polygon"
+      properties:
+        type: object
+        properties:
+          id:
+            type: integer
+      type:
+        type: string
+        enum:
+          - "Feature"
+
+  Point2D:
+    type: array
+    description: 2D point
+    minItems: 2
+    maxItems: 2
+    items:
+      type: number
+
+  Polygon:
+    type: object
+    description: GeoJSON polygon
+    properties:
+      coordinates:
+        type: array
+        items:
+          type: array
+          items:
+            $ref: "#/definitions/Point2D"
+      type:
+        type: string
+        enum:
+          - "Polygon"
+
+  UserDetails:
+    type: object
+    description: Object describing an LLC user
+    properties:
+      id:
+        type: string
+      first_name:
+        type: string
+      surname:
+        type: string
+      email:
+        type: string
+      organisation:
+        type: string
+      status:
+        type: string
+        enum:
+          - Active
+          - Inactive
+          - Suspended
+          - Archived
+      roles:
+        type: array
+        items:
+          type: string
+          enum:
+            - LLC LA Users
+            - LLC LR Users
+            - LLC LA Admins
+            - LLC LR Admins
+            - LLC Read Only Users
+            - LLC Account Only Users
+
+  PaidSearch:
+    type: object
+    description: Paid search information
+    properties:
+      search-id:
+        type: number
+      user-id:
+        type: string
+      payment-id:
+        type: string
+      charges:
+        type: array
+        items:
+          type: object
+      search-extent:
+        type: object
+      search-date:
+        type: string
+        format: datetime
+      search-area-description:
+        type: string
+      lapsed-date:
+        type: string
+        format: datetime
+      document-url:
+        type: string
+      parent-search-id:
+        type: number
+      payment-provider:
+        type: string
+      card-brand:
+        type: string
+      amount:
+        type: number
+      reference:
+        type: string
+
+  ServiceMessage:
+    type: object
+    description: Service message
+    properties:
+      messages:
+        required:
+          - message-name
+          - message-en
+          - message-cy
+        type: object
+        properties:
+          id:
+            type: number
+          message-name:
+            type: string
+          message-en:
+            type: string
+          message-cy:
+            type: string
+          hyperlink-message-en:
+            type: string
+          hyperlink-message-cy:
+            type: string
+          hyperlink-link-en:
+            type: string
+          hyperlink-link-cy:
+            type: string
+          message-expiry-date:
+            type: string
+
+  ServiceMessages:
+    type: object
+    description: Service messages
+    properties:
+      messages:
+        type: array
+        items:
+          $ref: "#/definitions/ServiceMessage"
+      expired-messages:
+        type: array
+        items:
+          $ref: "#/definitions/ServiceMessage"
+
+  SearchQuery:
+    type: object
+    description: Search query
+    properties:
+      id:
+        type: number
+      request_timestamp:
+        type: string
+        format: datetime
+      userid:
+        type: string
+      status:
+        type: string
+      completion_timestamp:
+        type: string
+        format: datetime
+      document:
+        type: string
+      external_url:
+        type: string
+        
+  FreeSearch:
+    type: object
+    properties:
+      id:
+        type: number
+      user-id:
+        type: string
+      search-extent:
+        $ref: "#/definitions/FeatureCollection"
+      search-date:
+        type: string
+        format: datetime
+      charge-ids:
+        type: array
+        items:
+          type: number

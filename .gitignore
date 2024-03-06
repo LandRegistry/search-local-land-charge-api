@@ -1,0 +1,23 @@
+# User-specific stuff:
+.idea/
+
+# Locally generated python files
+*.pyc
+__pycache__/
+*.cache
+*.coverage
+
+# Virtual environment files
+venv/
+
+# Ignore OSX files.
+.DS_Store
+
+coverage/
+.project
+.pydevproject
+maintain-frontend.iml
+package-lock.json
+nodejs.env
+
+.bash_history
